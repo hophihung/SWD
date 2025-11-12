@@ -1,0 +1,45 @@
+{
+  "name": "Recipe Sharing App - Quick Start Guide",
+  "steps": [
+    {
+      "step": 1,
+      "title": "Install Dependencies",
+      "command": "npm install"
+    },
+    {
+      "step": 2,
+      "title": "Setup Database",
+      "command": "npx prisma generate && npx prisma db push"
+    },
+    {
+      "step": 3,
+      "title": "Run Development Server",
+      "command": "npm run dev"
+    },
+    {
+      "step": 4,
+      "title": "Build for Production",
+      "command": "npm run build"
+    },
+    {
+      "step": 5,
+      "title": "Start Production Server",
+      "command": "npm start"
+    }
+  ],
+  "environment_variables": {
+    "required": [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "DATABASE_URL"
+    ]
+  },
+  "features": [
+    "Create, Read, Update, Delete recipes",
+    "Search by title",
+    "Filter by tags",
+    "Sort A-Z/Z-A",
+    "Image preview",
+    "Responsive design"
+  ]
+}
