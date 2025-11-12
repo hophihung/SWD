@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+const SUGGESTED_TAGS = [
+  "Vegan",
+  "Dessert",
+  "Quick",
+  "Gluten-Free",
+  "Healthy",
+  "Breakfast",
+  "Comfort Food",
+];
 
 export default function NewRecipe() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [imageValid, setImageValid] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     ingredients: "",
@@ -14,8 +26,33 @@ export default function NewRecipe() {
     imageUrl: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const tagChips = useMemo(
+    () =>
+      formData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+    [formData.tags]
+  );
+
+  const handleTagSelect = (tag: string) => {
+    if (tagChips.includes(tag)) return;
+    const tags = [...tagChips, tag].join(", ");
+    setFormData((prev) => ({ ...prev, tags }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+
+    const trimmedTitle = formData.title.trim();
+    const trimmedIngredients = formData.ingredients.trim();
+
+    if (!trimmedTitle || !trimmedIngredients) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -25,165 +62,197 @@ export default function NewRecipe() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: formData.title,
-          ingredients: formData.ingredients,
-          tags: formData.tags || null,
-          imageUrl: formData.imageUrl || null,
+          title: trimmedTitle,
+          ingredients: trimmedIngredients,
+          tags: formData.tags.trim() || null,
+          imageUrl: formData.imageUrl.trim() || null,
         }),
       });
 
       if (response.ok) {
-        router.push("/");
+        router.push("/?status=created");
       } else {
-        const error = await response.json();
-        alert(error.error || "Failed to create recipe");
+        const data = await response.json();
+        setError(data.error || "Failed to save recipe. Please try again.");
       }
-    } catch (error) {
-      console.error("Error creating recipe:", error);
-      alert("Error creating recipe");
+    } catch (err) {
+      console.error("Error creating recipe:", err);
+      setError("Unexpected error. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="mb-6">
+    <div className="flex min-h-screen flex-col bg-(--color-background)">
+      <header className="border-b border-(--color-border) bg-white/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-4xl items-center gap-4 px-6 py-6">
           <Link
             href="/"
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center gap-2 rounded-full border border-(--color-border) px-4 py-2 text-sm font-semibold text-[#333333] transition hover:bg-[#f5f5f5]"
           >
-            ← Back to Recipes
+            ← Back to recipes
           </Link>
         </div>
+      </header>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            Create New Recipe
-          </h1>
+      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
+        <div className="rounded-3xl bg-white p-8 shadow-(--shadow-card)">
+          <div className="flex flex-col gap-2 pb-6">
+            <span className="inline-flex w-max rounded-full bg-(--color-secondary) px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#9a5a2c]">
+              New recipe
+            </span>
+            <h1 className="text-3xl font-semibold text-[#333333]">
+              Document your signature dish
+            </h1>
+            <p className="text-sm text-(--color-muted)">
+              Share the story, ingredients, and flavors of your favorite
+              creation.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit}>
-            {/* Title */}
-            <div className="mb-6">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Title <span className="text-red-500">*</span>
+          {error && (
+            <div className="mb-6 rounded-2xl border border-[#ffd8bd] bg-[#fff4eb] px-4 py-3 text-sm font-medium text-[#9a5a2c]">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            <div className="grid gap-6 md:grid-cols-2">
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-[#333333]">
+                  Title <span className="text-[#d14343]">*</span>
+                </span>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
+                  placeholder="e.g., Caramelized Orange Tart"
+                  className="rounded-2xl border border-(--color-border) bg-(--color-background) px-4 py-3 text-sm shadow-inner focus:border-(--color-primary) focus:outline-none"
+                />
               </label>
-              <input
-                type="text"
-                id="title"
-                required
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., Chocolate Chip Cookies"
-              />
+
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-[#333333]">
+                  Tags <span className="text-(--color-muted)">(optional)</span>
+                </span>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tags: event.target.value,
+                    }))
+                  }
+                  placeholder="Try: Vegan, Dinner, Comfort Food"
+                  className="rounded-2xl border border-(--color-border) bg-(--color-background) px-4 py-3 text-sm shadow-inner focus:border-(--color-primary) focus:outline-none"
+                />
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {SUGGESTED_TAGS.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => handleTagSelect(tag)}
+                      className="rounded-full bg-(--color-secondary) px-3 py-1 text-xs font-semibold text-[#9a5a2c] transition hover:bg-[#ffd9a0]"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </label>
             </div>
 
-            {/* Ingredients */}
-            <div className="mb-6">
-              <label
-                htmlFor="ingredients"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Ingredients <span className="text-red-500">*</span>
-              </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-[#333333]">
+                Ingredients <span className="text-[#d14343]">*</span>
+              </span>
               <textarea
-                id="ingredients"
-                required
-                rows={6}
+                rows={8}
                 value={formData.ingredients}
-                onChange={(e) =>
-                  setFormData({ ...formData, ingredients: e.target.value })
+                onChange={(event) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    ingredients: event.target.value,
+                  }))
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter ingredients (one per line):&#10;2 cups flour&#10;1 cup sugar&#10;2 eggs"
+                placeholder={
+                  "One ingredient per line\n2 cups flour\n1 cup sugar\nZest of 1 lemon"
+                }
+                className="rounded-3xl border border-(--color-border) bg-(--color-background) px-4 py-4 text-sm leading-relaxed shadow-inner focus:border-(--color-primary) focus:outline-none"
               />
-              <p className="mt-1 text-sm text-gray-500">
-                Enter each ingredient on a new line
-              </p>
-            </div>
+              <span className="text-xs text-(--color-muted)">
+                Tip: include measurements and preparation notes for clarity.
+              </span>
+            </label>
 
-            {/* Tags */}
-            <div className="mb-6">
-              <label
-                htmlFor="tags"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Tags <span className="text-gray-400">(Optional)</span>
+            <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-[#333333]">
+                  Image URL{" "}
+                  <span className="text-(--color-muted)">(optional)</span>
+                </span>
+                <input
+                  type="url"
+                  value={formData.imageUrl}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setFormData((prev) => ({ ...prev, imageUrl: value }));
+                    setImageValid(true);
+                  }}
+                  placeholder="https://your-image-source.com/recipe.jpg"
+                  className="rounded-2xl border border-(--color-border) bg-(--color-background) px-4 py-3 text-sm shadow-inner focus:border-(--color-primary) focus:outline-none"
+                />
+                <span className="text-xs text-(--color-muted)">
+                  Paste a direct link to the dish photo.
+                </span>
               </label>
-              <input
-                type="text"
-                id="tags"
-                value={formData.tags}
-                onChange={(e) =>
-                  setFormData({ ...formData, tags: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., Vegan, Dessert, Quick"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                Separate tags with commas
-              </p>
-            </div>
 
-            {/* Image URL */}
-            <div className="mb-6">
-              <label
-                htmlFor="imageUrl"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Image URL <span className="text-gray-400">(Optional)</span>
-              </label>
-              <input
-                type="url"
-                id="imageUrl"
-                value={formData.imageUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, imageUrl: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="https://example.com/image.jpg"
-              />
-              {formData.imageUrl && (
-                <div className="mt-3">
-                  <p className="text-sm text-gray-600 mb-2">Preview:</p>
+              <div className="flex items-center justify-center rounded-3xl border border-dashed border-(--color-border) bg-(--color-background) p-4 text-center">
+                {formData.imageUrl && imageValid ? (
                   <img
                     src={formData.imageUrl}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-md"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
+                    alt="Recipe preview"
+                    className="h-40 w-full rounded-2xl object-cover"
+                    onError={() => setImageValid(false)}
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-sm text-(--color-muted)">
+                    <span className="text-3xl">📷</span>
+                    <span>Preview appears here</span>
+                    {!imageValid && (
+                      <span className="text-xs text-[#d14343]">
+                        Image could not be loaded.
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:bg-blue-400 disabled:cursor-not-allowed"
-              >
-                {loading ? "Creating..." : "Create Recipe"}
-              </button>
+            <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
               <Link
                 href="/"
-                className="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 transition-colors font-medium text-center"
+                className="inline-flex items-center justify-center rounded-full border border-(--color-border) px-5 py-3 text-sm font-semibold text-[#333333] transition hover:bg-[#f5f5f5]"
               >
                 Cancel
               </Link>
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-full bg-(--color-primary) px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-(--color-primary-hover) disabled:cursor-not-allowed disabled:bg-opacity-60"
+              >
+                {loading ? "Saving..." : "Save recipe"}
+              </button>
             </div>
           </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
