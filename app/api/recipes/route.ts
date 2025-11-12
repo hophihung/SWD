@@ -52,16 +52,38 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching recipes:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    // Check if it's a database connection error
+    const isConnectionError = 
+      errorMessage.includes("Can't reach database server") ||
+      errorMessage.includes("Connection") ||
+      errorMessage.includes("ECONNREFUSED") ||
+      errorMessage.includes("P1001") ||
+      errorMessage.includes("timeout");
+
     console.error("Error details:", {
       message: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
+      isConnectionError,
       databaseUrl: process.env.DATABASE_URL ? "Set" : "Missing",
+      databaseUrlPreview: process.env.DATABASE_URL 
+        ? process.env.DATABASE_URL.substring(0, 50) + "..." 
+        : "Missing",
     });
-    // Return error details in development, empty array in production
+
+    // Return helpful error message
+    const userMessage = isConnectionError
+      ? "Database connection failed. Please check DATABASE_URL in Vercel settings. Make sure you're using Connection Pooler (port 6543) for Vercel."
+      : process.env.NODE_ENV === "development"
+      ? errorMessage
+      : "Failed to fetch recipes. Please check server logs.";
+
     return NextResponse.json(
       {
-        error: process.env.NODE_ENV === "development" ? errorMessage : "Failed to fetch recipes",
-        details: process.env.NODE_ENV === "development" ? (error instanceof Error ? error.stack : undefined) : undefined,
+        error: userMessage,
+        ...(process.env.NODE_ENV === "development" && {
+          details: error instanceof Error ? error.stack : undefined,
+          originalError: errorMessage,
+        }),
       },
       { status: 500 }
     );

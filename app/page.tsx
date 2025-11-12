@@ -36,6 +36,19 @@ function HomeContent() {
       if (sortOrder) params.append("sort", sortOrder);
 
       const response = await fetch(`/api/recipes?${params.toString()}`);
+      
+      // Check if response is OK
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API error:", response.status, errorData);
+        setRecipes([]);
+        setToastMessage(
+          errorData.error || 
+          `Failed to load recipes (${response.status}). Please check your database connection.`
+        );
+        return;
+      }
+
       const data = await response.json();
 
       // Ensure data is an array
@@ -49,7 +62,7 @@ function HomeContent() {
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes([]);
-      setToastMessage("Unable to load recipes right now.");
+      setToastMessage("Unable to load recipes right now. Please check your connection.");
     } finally {
       setLoading(false);
     }
