@@ -37,9 +37,19 @@ function HomeContent() {
 
       const response = await fetch(`/api/recipes?${params.toString()}`);
       const data = await response.json();
-      setRecipes(data);
+
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setRecipes(data);
+      } else {
+        console.error("API returned non-array data:", data);
+        setRecipes([]);
+        setToastMessage(data.error || "Failed to load recipes");
+      }
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      setRecipes([]);
+      setToastMessage("Unable to load recipes right now.");
     } finally {
       setLoading(false);
     }

@@ -42,10 +42,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(recipes);
   } catch (error) {
     console.error("Error fetching recipes:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch recipes" },
-      { status: 500 }
-    );
+    // Always return an array, even on error
+    return NextResponse.json([], { status: 500 });
   }
 }
 
