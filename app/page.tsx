@@ -36,15 +36,15 @@ function HomeContent() {
       if (sortOrder) params.append("sort", sortOrder);
 
       const response = await fetch(`/api/recipes?${params.toString()}`);
-      
+
       // Check if response is OK
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error("API error:", response.status, errorData);
         setRecipes([]);
         setToastMessage(
-          errorData.error || 
-          `Failed to load recipes (${response.status}). Please check your database connection.`
+          errorData.error ||
+            `Failed to load recipes (${response.status}). Please check your database connection.`
         );
         return;
       }
@@ -62,7 +62,9 @@ function HomeContent() {
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes([]);
-      setToastMessage("Unable to load recipes right now. Please check your connection.");
+      setToastMessage(
+        "Unable to load recipes right now. Please check your connection."
+      );
     } finally {
       setLoading(false);
     }
@@ -157,7 +159,10 @@ function HomeContent() {
       suppressHydrationWarning
     >
       <header className="border-b border-(--color-border) bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between" suppressHydrationWarning>
+        <div
+          className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between"
+          suppressHydrationWarning
+        >
           <div className="flex items-center gap-3" suppressHydrationWarning>
             <span className="text-3xl">🍳</span>
             <div suppressHydrationWarning>
@@ -179,9 +184,18 @@ function HomeContent() {
             + Add Recipe
           </Link>
         </div>
-        <div className="border-t border-(--color-border) bg-white/90" suppressHydrationWarning>
-          <div className="mx-auto grid w-full max-w-6xl gap-3 px-6 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]" suppressHydrationWarning>
-            <div className="flex w-full items-center gap-3 rounded-full border border-(--color-border) bg-(--color-surface) px-4 shadow-sm shadow-[rgba(0,0,0,0.02)] focus-within:border-(--color-primary)" suppressHydrationWarning>
+        <div
+          className="border-t border-(--color-border) bg-white/90"
+          suppressHydrationWarning
+        >
+          <div
+            className="mx-auto grid w-full max-w-6xl gap-3 px-6 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]"
+            suppressHydrationWarning
+          >
+            <div
+              className="flex w-full items-center gap-3 rounded-full border border-(--color-border) bg-(--color-surface) px-4 shadow-sm shadow-[rgba(0,0,0,0.02)] focus-within:border-(--color-primary)"
+              suppressHydrationWarning
+            >
               <span className="text-lg text-(--color-muted)">🔍</span>
               <input
                 type="text"
@@ -227,9 +241,18 @@ function HomeContent() {
         </div>
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center" suppressHydrationWarning>
-            <div className="flex flex-col items-center gap-3" suppressHydrationWarning>
-              <div className="h-12 w-12 animate-spin rounded-full border-2 border-(--color-secondary) border-t-transparent" suppressHydrationWarning></div>
+          <div
+            className="flex flex-1 items-center justify-center"
+            suppressHydrationWarning
+          >
+            <div
+              className="flex flex-col items-center gap-3"
+              suppressHydrationWarning
+            >
+              <div
+                className="h-12 w-12 animate-spin rounded-full border-2 border-(--color-secondary) border-t-transparent"
+                suppressHydrationWarning
+              ></div>
               <p className="text-sm text-(--color-muted)">Loading recipes...</p>
             </div>
           </div>
@@ -331,7 +354,10 @@ function HomeContent() {
       </main>
 
       <footer className="border-t border-(--color-border) bg-white/80">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-(--color-muted) sm:flex-row sm:items-center sm:justify-between" suppressHydrationWarning>
+        <div
+          className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-(--color-muted) sm:flex-row sm:items-center sm:justify-between"
+          suppressHydrationWarning
+        >
           <span>© 2024 RecipeShare. Crafted with flavour.</span>
           <span>Keep cooking, keep sharing.</span>
         </div>
