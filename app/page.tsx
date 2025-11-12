@@ -157,10 +157,10 @@ function HomeContent() {
       suppressHydrationWarning
     >
       <header className="border-b border-(--color-border) bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between" suppressHydrationWarning>
+          <div className="flex items-center gap-3" suppressHydrationWarning>
             <span className="text-3xl">🍳</span>
-            <div>
+            <div suppressHydrationWarning>
               <Link
                 href="/"
                 className="text-2xl font-semibold text-(--color-primary)"
@@ -179,9 +179,9 @@ function HomeContent() {
             + Add Recipe
           </Link>
         </div>
-        <div className="border-t border-(--color-border) bg-white/90">
-          <div className="mx-auto grid w-full max-w-6xl gap-3 px-6 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]">
-            <div className="flex w-full items-center gap-3 rounded-full border border-(--color-border) bg-(--color-surface) px-4 shadow-sm shadow-[rgba(0,0,0,0.02)] focus-within:border-(--color-primary)">
+        <div className="border-t border-(--color-border) bg-white/90" suppressHydrationWarning>
+          <div className="mx-auto grid w-full max-w-6xl gap-3 px-6 py-4 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]" suppressHydrationWarning>
+            <div className="flex w-full items-center gap-3 rounded-full border border-(--color-border) bg-(--color-surface) px-4 shadow-sm shadow-[rgba(0,0,0,0.02)] focus-within:border-(--color-primary)" suppressHydrationWarning>
               <span className="text-lg text-(--color-muted)">🔍</span>
               <input
                 type="text"
@@ -217,7 +217,7 @@ function HomeContent() {
       </header>
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" suppressHydrationWarning>
           <h1 className="text-3xl font-semibold text-[#333333]">
             Your curated recipes
           </h1>
@@ -227,9 +227,9 @@ function HomeContent() {
         </div>
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <div className="h-12 w-12 animate-spin rounded-full border-2 border-(--color-secondary) border-t-(--color-primary)" />
+          <div className="flex flex-1 items-center justify-center" suppressHydrationWarning>
+            <div className="flex flex-col items-center gap-3" suppressHydrationWarning>
+              <div className="h-12 w-12 animate-spin rounded-full border-2 border-(--color-secondary) border-t-transparent" suppressHydrationWarning></div>
               <p className="text-sm text-(--color-muted)">Loading recipes...</p>
             </div>
           </div>
@@ -331,7 +331,7 @@ function HomeContent() {
       </main>
 
       <footer className="border-t border-(--color-border) bg-white/80">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-(--color-muted) sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-(--color-muted) sm:flex-row sm:items-center sm:justify-between" suppressHydrationWarning>
           <span>© 2024 RecipeShare. Crafted with flavour.</span>
           <span>Keep cooking, keep sharing.</span>
         </div>
