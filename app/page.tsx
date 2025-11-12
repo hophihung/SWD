@@ -139,7 +139,10 @@ function HomeContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-(--color-background)">
+    <div
+      className="flex min-h-screen flex-col bg-(--color-background)"
+      suppressHydrationWarning
+    >
       <header className="border-b border-(--color-border) bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
