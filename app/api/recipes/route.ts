@@ -7,7 +7,10 @@ export async function GET(request: NextRequest) {
     // Check if DATABASE_URL is set
     if (!process.env.DATABASE_URL) {
       console.error("DATABASE_URL is not set");
-      return NextResponse.json([], { status: 500 });
+      return NextResponse.json(
+        { error: "Database configuration missing. Please set DATABASE_URL environment variable." },
+        { status: 500 }
+      );
     }
 
     const searchParams = request.nextUrl.searchParams;
