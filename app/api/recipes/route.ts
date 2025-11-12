@@ -51,8 +51,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(recipes);
   } catch (error) {
     console.error("Error fetching recipes:", error);
-    // Always return an array, even on error
-    return NextResponse.json([], { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error details:", {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      databaseUrl: process.env.DATABASE_URL ? "Set" : "Missing",
+    });
+    // Return error details in development, empty array in production
+    return NextResponse.json(
+      {
+        error: process.env.NODE_ENV === "development" ? errorMessage : "Failed to fetch recipes",
+        details: process.env.NODE_ENV === "development" ? (error instanceof Error ? error.stack : undefined) : undefined,
+      },
+      { status: 500 }
+    );
   }
 }
 
